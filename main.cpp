@@ -1,17 +1,33 @@
 #include <iostream>
 
-#include "node.h"
+#include "bucket.h"
 
 
 int main(){
 
-    Node<int,int> a(2,3);
-    Node<std::string,int> b("hello",4);
+    Bucket<int,int> bucket;
 
-    a.printNode();
-    a.setValue(5);
-    a.printNode();
-    b.printNode();
+    bucket.insert(2,3);
+    bucket.insert(3,4);
+    bucket.insert(4,5);
+    bucket.insert(2,5);
+
+    bucket.printBucket();
+
+    auto val = bucket.find(2);
+
+    bucket.erase(2);
+
+    
+
+    if(val.first){
+        std::cout<<val.second;
+    }
+    else{
+        std::cout<<"Key not found";
+    }
+
+    bucket.printBucket();
 
 
 }
