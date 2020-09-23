@@ -1,6 +1,5 @@
 #ifndef BUCKET_H_
 #define BUCKET_H_
-#include <any>
 #include <functional>
 #include <iostream>
 #include <utility>
