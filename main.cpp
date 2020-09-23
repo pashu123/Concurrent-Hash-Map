@@ -1,33 +1,19 @@
 #include <iostream>
 
-#include "bucket.h"
+#include "map.h"
 
 
 int main(){
 
-    Bucket<int,int> bucket;
+    map<int,int> hello;
 
-    bucket.insert(2,3);
-    bucket.insert(3,4);
-    bucket.insert(4,5);
-    bucket.insert(2,5);
+    hello.insert(2,3);
+    hello.insert(3,2);
+    hello.insert(2,4);
+    hello.insert(3,4);
 
-    bucket.printBucket();
 
-    auto val = bucket.find(2);
-
-    bucket.erase(2);
-
-    
-
-    if(val.first){
-        std::cout<<val.second;
-    }
-    else{
-        std::cout<<"Key not found";
-    }
-
-    bucket.printBucket();
+    hello.printKeyBucket(2);
 
 
 }

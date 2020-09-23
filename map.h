@@ -29,6 +29,11 @@ struct map {
         hashTable[hashVal].erase(k);
     }
 
+    void printKeyBucket(KEY_T k){
+        size_t hashVal = hashFunction(k) % hashSize;
+        hashTable[hashVal].printBucket();
+    }
+
     void clear() {
         for (size_t i = 0; i < hashSize; i++) hashTable[i].clear();
     }

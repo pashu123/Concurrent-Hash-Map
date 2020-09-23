@@ -2,9 +2,13 @@
 #define BUCKET_H_
 #include <functional>
 #include <iostream>
+#include <shared_mutex>
 #include <utility>
 
 #include "node.h"
+
+// Implementing Shared mutex (Reader writer locks) for more information,
+// https://en.cppreference.com/w/cpp/thread/shared_mutex
 
 /// Bucket is a singly linked list of node. Front points to the first node of
 /// the bucket.
@@ -17,7 +21,8 @@ struct Bucket {
 
     // Finds the value, returns the pair of bool and value type, if the key is
     // not found pair.first = False.
-    std::pair<bool,VAL_T> find(KEY_T key) {
+    std::pair<bool, VAL_T> find(KEY_T key) {
+        std::shared_lock<std::shared_timed_mutex> lock(m);
         Node<KEY_T, VAL_T>* temp = front;
 
         while (temp != nullptr) {
@@ -32,6 +37,7 @@ struct Bucket {
     // Inserting the key and value pair, if the key is found update the value,
     // else insert a new key value pair into the bucket.
     void insert(KEY_T key, VAL_T value) {
+        std::unique_lock<std::shared_timed_mutex> lock(m);
         Node<KEY_T, VAL_T>* previous = nullptr;
         Node<KEY_T, VAL_T>* temp = front;
 
@@ -52,9 +58,11 @@ struct Bucket {
 
     // Erase the key if found, else do nothing;
     void erase(KEY_T key) {
+        std::unique_lock<std::shared_timed_mutex> lock(m);
         Node<KEY_T, VAL_T>* previous = nullptr;
         Node<KEY_T, VAL_T>* temp = front;
 
+        // Traverse keeping the previous pointer to the key.
         while (temp != nullptr && temp->getKey() != key) {
             previous = temp;
             temp = temp->next;
@@ -73,6 +81,7 @@ struct Bucket {
     // Traverse the whole bucket (linked list) printing the Key Value pairs,
     // Just for debugging purpose.
     void printBucket() {
+        std::shared_lock<std::shared_timed_mutex> lock(m);
         Node<KEY_T, VAL_T>* temp = front;
 
         while (temp != nullptr) {
@@ -81,7 +90,9 @@ struct Bucket {
         }
     }
 
+    // Deletes the whole bucket, used by the desctuctor.
     void delBucket() {
+        std::unique_lock<std::shared_timed_mutex> lock(m);
         Node<KEY_T, VAL_T>* previous = nullptr;
         Node<KEY_T, VAL_T>* temp = front;
 
@@ -96,6 +107,7 @@ struct Bucket {
 
    private:
     Node<KEY_T, VAL_T>* front;
+    mutable std::shared_timed_mutex m;
 };
 
 #endif
