@@ -14,7 +14,7 @@
 /// the bucket.
 template <typename KEY_T, typename VAL_T>
 struct Bucket {
-    Bucket() : front(nullptr) {}
+    Bucket() : front(nullptr), size(0) {}
 
     // Traversing and deleting the whole linked list.
     ~Bucket() { delBucket(); }
@@ -22,7 +22,7 @@ struct Bucket {
     // Finds the value, returns the pair of bool and value type, if the key is
     // not found pair.first = False.
     std::pair<bool, VAL_T> find(KEY_T key) {
-        std::shared_lock<std::shared_timed_mutex> lock(m);
+        std::shared_lock lock(m);
         Node<KEY_T, VAL_T>* temp = front;
 
         while (temp != nullptr) {
@@ -37,7 +37,7 @@ struct Bucket {
     // Inserting the key and value pair, if the key is found update the value,
     // else insert a new key value pair into the bucket.
     void insert(KEY_T key, VAL_T value) {
-        std::unique_lock<std::shared_timed_mutex> lock(m);
+        std::unique_lock lock(m);
         Node<KEY_T, VAL_T>* previous = nullptr;
         Node<KEY_T, VAL_T>* temp = front;
 
@@ -46,11 +46,14 @@ struct Bucket {
             temp = temp->next;
         }
 
-        if (nullptr == temp) {     // We have reached the end of the bucket.
-            if (nullptr == front)  // Checking the front.
+        if (nullptr == temp) {       // We have reached the end of the bucket.
+            if (nullptr == front) {  // Checking the front.
                 front = new Node<KEY_T, VAL_T>(key, value);
-            else
+                size += 1;
+            } else {
                 previous->next = new Node<KEY_T, VAL_T>(key, value);
+                size += 1;
+            }
         } else {  // Node is found with the key, just change the value.
             temp->setValue(value);
         }
@@ -58,7 +61,7 @@ struct Bucket {
 
     // Erase the key if found, else do nothing;
     void erase(KEY_T key) {
-        std::unique_lock<std::shared_timed_mutex> lock(m);
+        std::unique_lock lock(m);
         Node<KEY_T, VAL_T>* previous = nullptr;
         Node<KEY_T, VAL_T>* temp = front;
 
@@ -75,13 +78,14 @@ struct Bucket {
         else
             previous->next = temp->next;
 
+        size -= 1;
         delete temp;
     }
 
     // Traverse the whole bucket (linked list) printing the Key Value pairs,
     // Just for debugging purpose.
     void printBucket() {
-        std::shared_lock<std::shared_timed_mutex> lock(m);
+        std::shared_lock lock(m);
         Node<KEY_T, VAL_T>* temp = front;
 
         while (temp != nullptr) {
@@ -90,9 +94,9 @@ struct Bucket {
         }
     }
 
-    // Deletes the whole bucket, used by the desctuctor.
+    // Deletes the whole bucket, used by the destructor.
     void delBucket() {
-        std::unique_lock<std::shared_timed_mutex> lock(m);
+        std::unique_lock lock(m);
         Node<KEY_T, VAL_T>* previous = nullptr;
         Node<KEY_T, VAL_T>* temp = front;
 
@@ -102,12 +106,17 @@ struct Bucket {
             delete previous;
         }
 
+        size = 0;
         front = nullptr;
     }
 
+    // Debugging purpose;
+    const int getSize() { return size; }
+
    private:
     Node<KEY_T, VAL_T>* front;
-    mutable std::shared_timed_mutex m;
+    mutable std::shared_mutex m;
+    int size;
 };
 
 #endif

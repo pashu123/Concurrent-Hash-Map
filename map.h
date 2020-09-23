@@ -6,6 +6,7 @@
 #include "bucket.h"
 size_t DEFAULT_HASH_SIZE = 1341;
 
+/// Hash map with chaining operations.
 template <typename KEY_T, typename VAL_T>
 struct map {
     map(size_t size = DEFAULT_HASH_SIZE) : hashSize(size) {
@@ -29,13 +30,19 @@ struct map {
         hashTable[hashVal].erase(k);
     }
 
-    void printKeyBucket(KEY_T k){
+    void printKeyBucket(KEY_T k) {
         size_t hashVal = hashFunction(k) % hashSize;
         hashTable[hashVal].printBucket();
     }
 
+    const int getSize() {
+        int totSize = 0;
+        for (size_t i = 0; i < hashSize; i++) totSize += hashTable[i].getSize();
+        return totSize;
+    }
+
     void clear() {
-        for (size_t i = 0; i < hashSize; i++) hashTable[i].clear();
+        for (size_t i = 0; i < hashSize; i++) hashTable[i].delBucket();
     }
 
    private:
