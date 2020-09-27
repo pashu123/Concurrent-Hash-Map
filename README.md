@@ -5,7 +5,7 @@ Hash Map with chaining supports concurrent operations.
 <b> compile client with </b>  `g++ -std=c++17 -lpthread client.cpp -o client` <br>
 <b> compile server with </b>  `g++ -std=c++17 -lpthread server.cpp -o server` <br>
 
-<p>The following code is benchmarked with 100000 operations on core i7(1065G7) CPU.</p>
+<p>The following code is benchmarked with 100000 operations on core i7(1065G7) CPU. Below time are measured in ms.</p>
 
 
 ### Benchmarking only on find operations.
