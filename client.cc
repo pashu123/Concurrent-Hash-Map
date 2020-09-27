@@ -6,7 +6,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#define SHMSIZ 1024
+#include <iostream>
+
+#define SHMSIZE 1024
 
 int main(void) {
     key_t key;
@@ -18,8 +20,20 @@ int main(void) {
     // The key is same for client and receiver.
     key = getuid();
 
+    // valid commands in cout.
+    std::cout << "The valid commands are: "
+              << "find x (finds the value in the hashmap), "
+              << "insert x y (Insert the key value pair x,y into hashmap), "
+              << "delete x (Deletes the key x), "
+              << "quit (quits the current client), "
+              << "quitserver (quits the server as well as client)" << std::endl;
+
+    std::cout << "Please make sure that you insert only single space, this "
+                 "program is not tested for errors."
+              << std::endl;
+
     // Get the shared block or create it, if invoked by another client.
-    shmid = shmget(key, SHMSIZ, IPC_CREAT | 0666);
+    shmid = shmget(key, SHMSIZE, IPC_CREAT | 0666);
 
     if (shmid < 0) {
         perror("shmget failed: shared memory segment wasn't created");
@@ -50,19 +64,5 @@ int main(void) {
         // server signalizes it has finished reading the input string by
         // inserting an '@' symbol to the memory address shm is pointing to.
         while (*shm != '@') sleep(1);
-    }
-
-    // The shared memory segment should be dettached from data space. An error
-    // is raised if segment isn't dettached
-    if (shmdt(shm) == -1) {
-        perror("shmdt failed: segment wasn't dettached from data space");
-        exit(1);
-    }
-
-    // The shared memory IPC communication should be closed. An error is raised
-    // if communication doesn't close
-    if (shmctl(shmid, IPC_RMID, 0) == -1) {
-        perror("shmctl failed: ipc didn't close");
-        exit(1);
     }
 }

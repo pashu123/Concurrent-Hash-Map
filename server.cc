@@ -23,7 +23,7 @@ int main(void) {
     key = getuid();
 
     // Get the shared block created by the client.
-    shmid = shmget(key, SHMSIZE, 0666);
+    shmid = shmget(key, SHMSIZE, IPC_CREAT | 0666);
     if (shmid < 0) {
         perror("shmget failed: shared memory segment wasn't created");
         exit(EXIT_FAILURE);
@@ -60,7 +60,7 @@ int main(void) {
                 // If the input string is "quit" the infinite loop is
                 // interrupted, so that the shared memory segment can be
                 // dettached
-                if (strcmp(token, "quit") == 0) {
+                if (strncmp(line, "quitserver", 10) == 0) {
                     std::cout << "BYE BYE" << std::endl;
                     infinite_loop = 0;
                 }
@@ -88,8 +88,8 @@ int main(void) {
                 else if (strcmp(token, "delete") == 0) {
                     char *token1 = strtok(NULL, " ");
                     hashMap.erase(atoi(token1));
-                    std::cout << atoi(token1)
-                              << " if the key was present in the hasmap then "
+                    std::cout << "If the key " << atoi(token1)
+                              << " was present in the hasmap then "
                                  "it is deleted"
                               << std::endl;
                 } else {
@@ -106,6 +106,13 @@ int main(void) {
 
     if (shmdt(shm) == -1) {
         perror("shmdt failed: segment wasn't dettached from data space");
+        exit(1);
+    }
+
+    // The shared memory IPC communication should be closed. An error is raised
+    // if communication doesn't close
+    if (shmctl(shmid, IPC_RMID, 0) == -1) {
+        perror("shmctl failed: ipc didn't close");
         exit(1);
     }
 }
