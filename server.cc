@@ -39,14 +39,11 @@ int main(void) {
     // Default initialization of hash map.
     map<int, int> hashMap;
     while (infinite_loop) {
-
         // wait for the user input.
         if (*shm != (int)NULL) {
-
             // *shm begins with an '@' while there is no new input. Thus, the
             // program has to wait for a new input
             if (*shm != '@') {
-
                 // cnt_char is set to 0.
                 int cnt_char = 0;
                 memset(line, 0, sizeof(line));
@@ -100,12 +97,8 @@ int main(void) {
                               << std::endl;
                 }
 
-                // The program signalizes it has finished reading the input
-                // string by inserting an '@' symbol to the memory address
-                // shm is pointing to (the beginning of the shared memory
-                // string). Thus, receiver.c can ask the user for a new
-                // input and also, process.c is signalized to wait for the
-                // new input before writing it into the output file
+                // The server signalizes it has finished reading the input
+                // string by inserting an '@' symbol to the memory address.
                 *shm = '@';
             }
         }

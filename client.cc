@@ -14,8 +14,11 @@ int main(void) {
     int infinite_loop = 1;
     char *shm, *s, c;
     char *user_input = (char *)malloc(sizeof(char) * BUFSIZ);
+
+    // The key is same for client and receiver.
     key = getuid();
 
+    // Get the shared block or create it, if invoked by another client.
     shmid = shmget(key, SHMSIZ, IPC_CREAT | 0666);
 
     if (shmid < 0) {
@@ -23,6 +26,7 @@ int main(void) {
         exit(EXIT_FAILURE);
     }
 
+    // Map the shared block into this process's memory and give a pointer to it.
     shm = (char *)shmat(shmid, nullptr, 0);
 
     if (shm == (char *)-1) {
@@ -36,18 +40,15 @@ int main(void) {
         if (strncmp(user_input, "quit", 4) == 0) {
             infinite_loop = 0;
         }
-
         memcpy(shm, user_input, strlen(user_input));
-
         s = shm;
         s += strlen(user_input);
+
+        // The end of shared memory has '$' token written.
         *s = '$';
 
-        // Processor.c signalizes it has finished reading the input string by
-        // inserting an '@' symbol to the memory address shm is pointing to (the
-        // beginning of the shared memory string). So, here receiver.c is
-        // waiting for that signal so that it can restart the loop. ('@' is not
-        // alpha numeric, so it won't harm the program main functionality)
+        // server signalizes it has finished reading the input string by
+        // inserting an '@' symbol to the memory address shm is pointing to.
         while (*shm != '@') sleep(1);
     }
 
