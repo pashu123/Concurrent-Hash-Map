@@ -25,7 +25,7 @@ Hash Map with chaining supports concurrent operations.
 | 1000  | 66  | 57  | 84  | 19  |
 | 10000  |  10  | 16  | 10  | 5  |
 
-### Benchmarking with interleaved find and delete operations(No. of operation is doubled).
+### Benchmarking with interleaved find and delete operations (No. of operation is doubled).
    Size of HashTable  |  #Threads:1 | #Threads:2 | #Threads:4 | #Threads:8 |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 | 10  | 20572  | 16662  | 16093  | 14659  |
